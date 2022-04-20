@@ -1,5 +1,6 @@
 <template>
   <h2>Sipariş Oluştur</h2>
+  <Message v-for="msg of messages" :severity="msg.severity" :key="msg.id">{{msg.content}}</Message>
   <form id="add-order" class="grid">
     <div class="col-5">
       <div class="grid">
@@ -109,15 +110,15 @@
         </div> -->
         <ul>
           <li class="col-12" v-for="(size, index) in selectedSizes" :key="size.sizeId">
-            <label class="col-3">{{ size.sizeName }}</label>
+            <label class="col-3 size-lbl">{{ size.sizeName }}</label>
               <InputNumber
-                class="col-9 col-offset-4"
+                class="col-9 col-offset-4 input-number"
                 id="horizontal"
                 v-model="this.form.quantities[index]"
                 mode="decimal"
                 showButtons
                 buttonLayout="horizontal"
-                style="width: 2rem; height: 3rem"
+                style="width: 2rem; height: 3rem;"
                 decrementButtonClass="p-button-secondary"
                 incrementButtonClass="p-button-secondary"
                 incrementButtonIcon="pi pi-plus"
@@ -142,7 +143,7 @@ import Dropdown from "primevue/dropdown";
 import Calendar from "primevue/calendar";
 import InputNumber from "primevue/inputnumber";
 import Button from "primevue/button";
-// import Message from "primevue/message"
+import Message from "primevue/message"
 
 export default {
   name: "AddOrder",
@@ -151,6 +152,7 @@ export default {
     Calendar,
     InputNumber,
     Button,
+    Message
   },
   data() {
     return {
@@ -176,7 +178,8 @@ export default {
         colorId: 1,
         sizeSetId: 1,
         sizes: [],
-        quantities: []
+        quantities: [],
+        messages: [],
       },
       //message: null
     };
@@ -189,27 +192,31 @@ export default {
   // },
 
   methods: {
+    addMessages() {
+            this.messages = [
+                {severity: 'success', content: 'Sipariş başarıyla eklendi', id: 1}
+            ]
+        },
     submit(){
-      console.log(this.form.orderNumber);
-      console.log(this.form.countryId);
-      console.log(this.form.termin);
-      console.log(this.form.productId);
-      console.log(this.form.patternId);
-      console.log(this.form.seasonId);
-      console.log(this.form.colorId);
-      console.log(this.form.sizeSetId);
-      console.log(this.form.sizes);
-      console.log(this.form.quantities);
-
       axios.post('https://localhost:5001/Order/AddOrder', this.form )
       .then(res => {
-         // response
          res.json;
+
+         this.form = {
+            orderNumber: null,
+            countryId: 1,
+            termin: null,
+            productId: 1,
+            patternId: 1,
+            seasonId: 1,
+            colorId: 1,
+            sizeSetId: 1,
+            sizes: [],
+            quantities: []
+          }
+          this.onChange();
+          this.addMessages();
       });
-
-      this.getDatas();
-      //this.message = {severity: 'info', content: 'Sipariş başarıyla oluşturuldu.', id: "okey"};
-
     },
     onChange() {
       this.form.quantities = [];
@@ -282,6 +289,7 @@ export default {
         .get("https://localhost:5001/Order/SizeSetSizeList")
         .then((response) => {
           this.sizeSetSizeList = response.data;
+          this.onChange();
         })
         .catch(function (error) {
           alert(error);
@@ -341,5 +349,8 @@ label {
 Button {
   position: absolute;
   right: 100px;
+}
+.size-lbl{
+  font-width: 45px 
 }
 </style>
